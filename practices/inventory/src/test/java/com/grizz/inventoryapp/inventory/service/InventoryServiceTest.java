@@ -82,10 +82,7 @@ class InventoryServiceTest {
             // given
             final Long quantity = -1L;
 
-            // when
-            final Inventory result = sut.decreaseByItemId(existingItemId, quantity);
-
-            // then
+            // when, then
             assertThrows(InvalidDecreaseQuantityException.class, () -> {
                 sut.decreaseByItemId(existingItemId, quantity);
             });
@@ -98,10 +95,7 @@ class InventoryServiceTest {
             final String nonExistingItemId = "2";
             final Long quantity = 10L;
 
-            // when
-            final Inventory result = sut.decreaseByItemId(nonExistingItemId, quantity);
-
-            // then
+            // when, then
             assertThrows(ItemNotFoundException.class, () -> {
                 sut.decreaseByItemId(nonExistingItemId, quantity);
             });
@@ -113,10 +107,7 @@ class InventoryServiceTest {
             // given
             final Long quantity = stock + 1;
 
-            // when
-            final Inventory result = sut.decreaseByItemId(existingItemId, quantity);
-
-            // then
+            // when, then
             assertThrows(InsufficientStockException.class, () -> {
                 sut.decreaseByItemId(existingItemId, quantity);
             });
@@ -132,10 +123,7 @@ class InventoryServiceTest {
             // 불가피하게 0을 반환하도록 stubbing
             doReturn(0).when(inventoryJpaRepository).decreaseStock(existingItemId, quantity);
 
-            // when
-            final Inventory result = sut.decreaseByItemId(existingItemId, quantity);
-
-            // then
+            // when, then
             assertThrows(ItemNotFoundException.class, () -> {
                 sut.decreaseByItemId(existingItemId, quantity);
             });
