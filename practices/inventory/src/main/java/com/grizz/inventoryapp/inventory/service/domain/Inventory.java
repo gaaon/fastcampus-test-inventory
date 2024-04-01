@@ -1,11 +1,21 @@
 package com.grizz.inventoryapp.inventory.service.domain;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Inventory {
-    public String getItemId() {
-        return null;
+    private @NotNull String itemId;
+    private @NotNull Long stock;
+
+    public Inventory(@NotNull String itemId, @NotNull Long stock) {
+        this.itemId = itemId;
+        this.stock = stock;
     }
 
-    public Long getStock() {
-        return null;
+    public @NotNull String getItemId() {
+        return itemId;
+    }
+
+    public @NotNull Long getStock() {
+        return stock;
     }
 }
