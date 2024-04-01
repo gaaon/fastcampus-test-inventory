@@ -19,6 +19,10 @@ public class InventoryService {
                 .orElse(null);
     }
 
+    public @NotNull Inventory decreaseByItemId(@NotNull String itemId, @NotNull Long quantity) {
+        return null;
+    }
+
     private Inventory mapToDomain(InventoryEntity inventoryEntity) {
         return new Inventory(inventoryEntity.getItemId(), inventoryEntity.getStock());
     }
