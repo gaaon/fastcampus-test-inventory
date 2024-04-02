@@ -45,6 +45,10 @@ public class InventoryService {
         return mapToDomain(updatedEntity);
     }
 
+    public @NotNull Inventory updateStock(@NotNull String itemId, @NotNull Long stock) {
+        return null;
+    }
+
     private Inventory mapToDomain(InventoryEntity inventoryEntity) {
         return new Inventory(inventoryEntity.getItemId(), inventoryEntity.getStock());
     }
