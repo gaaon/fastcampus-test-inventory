@@ -19,7 +19,9 @@ public class InventoryIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    final String existingItemId = "1";
     final String nonExistingItemId = "2";
+    final Long stock = 100L;
 
     @DisplayName("재고 조회 실패")
     @Test
@@ -33,8 +35,11 @@ public class InventoryIntegrationTest {
 
     @DisplayName("재고 조회 성공")
     @Test
-    void test2() {
-        throw new NotImplementedTestException();
+    void test2() throws Exception {
+        mockMvc.perform(get("/api/v1/inventory/{itemId}", existingItemId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.item_id").value(existingItemId))
+                .andExpect(jsonPath("$.data.stock").value(stock));
     }
 
     @DisplayName("재고 차감 실패")
