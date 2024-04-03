@@ -10,8 +10,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -19,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Testcontainers
 @Transactional
 @ActiveProfiles("integration-test2")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -28,6 +34,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AnnotationInventoryIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Container
+    private static final MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.3")
+            .withDatabaseName("inventory")
+            .withUsername("root")
+            .withPassword("1234")
+            .withUrlParam("serverTimezone", "UTC")
+            .withUrlParam("useSSL", "false")
+            .withUrlParam("allowPublicKeyRetrieval", "true");
+
+    @DynamicPropertySource
+    static void setDatasourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", mySQLContainer::getUsername);
+        registry.add("spring.datasource.password", mySQLContainer::getPassword);
+    }
 
     final String existingItemId = "1";
     final String nonExistingItemId = "2";
