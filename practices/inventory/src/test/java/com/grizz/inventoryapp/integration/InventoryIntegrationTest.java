@@ -119,8 +119,23 @@ public class InventoryIntegrationTest {
 
     @DisplayName("재고 수정 성공")
     @Test
-    void test6() {
-        throw new NotImplementedTestException();
+    void test6() throws Exception {
+        // 1. 재고를 조회하고 100개인 것을 확인한다.
+        successGetStock(existingItemId, stock);
+
+        // 2. 재고를 1000개로 수정하고 성공한다.
+        final Long newStock = 1000L;
+        final String requestBody = "{\"stock\": " + newStock + "}";
+        mockMvc.perform(
+                        patch("/api/v1/inventory/{itemId}/stock", existingItemId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.item_id").value(existingItemId))
+                .andExpect(jsonPath("$.data.stock").value(newStock));
+
+        // 3. 재고를 조회하고 1000개인 것을 확인한다.
+        successGetStock(existingItemId, newStock);
     }
 
     @DisplayName("재고 차감, 수정 종합")
