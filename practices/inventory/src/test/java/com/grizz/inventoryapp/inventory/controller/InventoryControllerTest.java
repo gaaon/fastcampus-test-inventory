@@ -1,8 +1,5 @@
 package com.grizz.inventoryapp.inventory.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.grizz.inventoryapp.common.controller.GlobalExceptionHandler;
 import com.grizz.inventoryapp.config.JsonConfig;
 import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
@@ -19,9 +16,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.grizz.inventoryapp.test.assertion.Assertions.assertMvcDataEquals;
+import static com.grizz.inventoryapp.test.assertion.Assertions.assertMvcErrorEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,10 +32,6 @@ public class InventoryControllerTest {
 
     @Autowired
     MockMvc mockMvc;
-
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
     @DisplayName("재고 조회")
     @Nested
@@ -58,14 +51,7 @@ public class InventoryControllerTest {
                     .andReturn();
 
             // then
-            final String content = result.getResponse().getContentAsString();
-            final var responseBody = objectMapper.readTree(content);
-            final var errorField = responseBody.get("error");
-
-            assertNotNull(errorField);
-            assertTrue(errorField.isObject());
-            assertEquals(ErrorCodes.ITEM_NOT_FOUND.code, errorField.get("code").asLong());
-            assertEquals(ErrorCodes.ITEM_NOT_FOUND.message, errorField.get("local_message").asText());
+            assertMvcErrorEquals(result, ErrorCodes.ITEM_NOT_FOUND);
 
             verify(inventoryService).findByItemId(itemId);
         }
@@ -84,14 +70,10 @@ public class InventoryControllerTest {
                     .andReturn();
 
             // then
-            final String content = result.getResponse().getContentAsString();
-            final var responseBody = objectMapper.readTree(content);
-            final var dataField = responseBody.get("data");
-
-            assertNotNull(dataField);
-            assertTrue(dataField.isObject());
-            assertEquals(inventory.getItemId(), dataField.get("item_id").asText());
-            assertEquals(inventory.getStock(), dataField.get("stock").asLong());
+            assertMvcDataEquals(result, dataField -> {
+                assertEquals(inventory.getItemId(), dataField.get("item_id").asText());
+                assertEquals(inventory.getStock(), dataField.get("stock").asLong());
+            });
 
             verify(inventoryService).findByItemId(itemId);
         }
