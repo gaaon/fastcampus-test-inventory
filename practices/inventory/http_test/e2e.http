@@ -70,4 +70,19 @@ Content-Type: application/json
 %}
 
 ### 재고 수정 실패
+@invalidStock = -1
+
+PATCH {{restUrl}}/api/v1/inventory/{{existingItemId}}/stock
+Content-Type: application/json
+
+{
+  "stock": {{invalidStock}}
+}
+
+> {%
+    import { assertE2eErrorEquals } from './scripts/assertions'
+
+    assertE2eErrorEquals(400, 1003, '재고가 유효하지 않습니다')
+%}
+
 ### 재고 수정 성공
