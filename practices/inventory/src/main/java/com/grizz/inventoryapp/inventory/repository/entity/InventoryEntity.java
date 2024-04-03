@@ -1,9 +1,15 @@
 package com.grizz.inventoryapp.inventory.repository.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Table(name = "inventory")
+@Entity
 public class InventoryEntity {
+    @Id
     private @Nullable Long id;
     private @NotNull String itemId;
     private @NotNull Long stock;
@@ -12,6 +18,9 @@ public class InventoryEntity {
         this.id = id;
         this.itemId = itemId;
         this.stock = stock;
+    }
+
+    public InventoryEntity() {
     }
 
     public Long getId() {
