@@ -4,13 +4,24 @@ import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+
 public class InventoryPersistenceAdapterStub implements InventoryPersistenceAdapter {
-    public void addInventory(@NotNull String itemId, @NotNull Long stock) {
+    private final List<Inventory> inventoryList = new ArrayList<>();
+    private final AtomicLong idGenerator = new AtomicLong(1);
+
+    public void addInventory(String itemId, Long stock) {
+        final Long id = idGenerator.getAndIncrement();
+        final Inventory inventory = new Inventory(id, itemId, stock);
+        inventoryList.add(inventory);
     }
 
     @Override
     public @Nullable Inventory findByItemId(@NotNull String itemId) {
-        return null;
+        return internalFindByItemId(itemId).orElse(null);
     }
 
     @Override
@@ -21,5 +32,11 @@ public class InventoryPersistenceAdapterStub implements InventoryPersistenceAdap
     @Override
     public @NotNull Inventory save(@NotNull Inventory inventory) {
         return null;
+    }
+
+    private Optional<Inventory> internalFindByItemId(String itemId) {
+        return inventoryList.stream()
+                .filter(entity -> entity.getItemId().equals(itemId))
+                .findFirst();
     }
 }

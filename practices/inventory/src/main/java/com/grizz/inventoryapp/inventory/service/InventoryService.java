@@ -1,6 +1,5 @@
 package com.grizz.inventoryapp.inventory.service;
 
-import com.grizz.inventoryapp.inventory.repository.entity.InventoryEntity;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.persistence.InventoryPersistenceAdapter;
 import jakarta.transaction.Transactional;
@@ -17,10 +16,7 @@ public class InventoryService {
     }
 
     public @Nullable Inventory findByItemId(@NotNull String itemId) {
-        return null;
-//        return inventoryJpaRepository.findByItemId(itemId)
-//                .map(inventoryEntity -> new Inventory(inventoryEntity.getItemId(), inventoryEntity.getStock()))
-//                .orElse(null);
+        return inventoryAdapter.findByItemId(itemId);
     }
 
     @Transactional
