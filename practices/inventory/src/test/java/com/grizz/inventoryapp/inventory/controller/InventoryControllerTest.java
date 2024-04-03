@@ -9,7 +9,6 @@ import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockExcep
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidStockException;
 import com.grizz.inventoryapp.inventory.service.exception.ItemNotFoundException;
-import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import com.grizz.inventoryapp.test.fixture.InventoryFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
