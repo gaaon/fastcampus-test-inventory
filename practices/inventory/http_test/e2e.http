@@ -86,3 +86,13 @@ Content-Type: application/json
 %}
 
 ### 재고 수정 성공
+< scripts/preUpdateStock.js
+
+PATCH {{restUrl}}/api/v1/inventory/{{existingItemId}}/stock
+Content-Type: application/json
+
+{
+  "stock": {{newStock}}
+}
+
+> scripts/testUpdateStock.js
