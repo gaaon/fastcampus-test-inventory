@@ -19,6 +19,23 @@ GET {{restUrl}}/api/v1/inventory/{{existingItemId}}
 %}
 
 ### 재고 차감 실패
+< {%
+    const quantity = request.environment.get('veryLargeQuantity')
+    request.variables.set('quantity', quantity)
+%}
+POST {{restUrl}}/api/v1/inventory/{{existingItemId}}/decrease
+Content-Type: application/json
+
+{
+    "quantity": {{quantity}}
+}
+
+> {%
+    import { assertE2eErrorEquals } from './scripts/assertions'
+
+    assertE2eErrorEquals(400, 1001, '재고가 부족합니다')
+%}
+
 ### 재고 차감 성공
 ### 재고 수정 실패
 ### 재고 수정 성공
