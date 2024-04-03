@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,8 +52,23 @@ public class InventoryIntegrationTest {
 
     @DisplayName("재고 차감 실패")
     @Test
-    void test3() {
-        throw new NotImplementedTestException();
+    void test3() throws Exception {
+        // 1. 재고를 조회하고 100개인 것을 확인한다.
+        successGetStock(existingItemId, stock);
+
+        // 2. 재고 110개를 차감하고 실패한다.
+        final Long quantity = 110L;
+        final String requestBody = "{\"quantity\": " + quantity + "}";
+        mockMvc.perform(
+                        post("/api/v1/inventory/{itemId}/decrease", existingItemId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value(ErrorCodes.INSUFFICIENT_STOCK.code))
+                .andExpect(jsonPath("$.error.local_message").value(ErrorCodes.INSUFFICIENT_STOCK.message));
+
+        // 3. 재고를 조회하고 100개인 것을 확인한다.
+        successGetStock(existingItemId, stock);
     }
 
     @DisplayName("재고 차감 성공")
@@ -76,5 +93,12 @@ public class InventoryIntegrationTest {
     @Test
     void test7() {
         throw new NotImplementedTestException();
+    }
+
+    private void successGetStock(String itemId, Long stock) throws Exception {
+        mockMvc.perform(get("/api/v1/inventory/{itemId}", itemId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.item_id").value(itemId))
+                .andExpect(jsonPath("$.data.stock").value(stock));
     }
 }
