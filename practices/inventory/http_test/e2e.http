@@ -2,34 +2,20 @@
 GET {{restUrl}}/api/v1/inventory/{{nonExistingItemId}}
 
 > {%
-    client.test("응답의 status는 404이다", function () {
-        client.assert(response.status === 404, "응답의 status는 404가 아니다")
-    })
+    import { assertE2eErrorEquals } from './scripts/assertions'
 
-    client.test("응답의 body는 error를 포함한다", function () {
-        const error = response.body.error
-        client.assert(error !== null)
-        client.assert(error.code === 1000)
-        client.assert(error.local_message === '자산이 존재하지 않습니다')
-    })
+    assertE2eErrorEquals(404, 1000, '자산이 존재하지 않습니다')
 %}
 
 ### 재고 조회 성공
 GET {{restUrl}}/api/v1/inventory/{{existingItemId}}
 
 > {%
+    import { assertE2eDataEquals } from './scripts/assertions'
+
     const existingItemId = request.environment.get('existingItemId')
 
-    client.test("응답의 status는 200이다", function () {
-        client.assert(response.status === 200, '응답의 status는 200이 아니다')
-    })
-
-    client.test('응답의 body는 data를 포함한다', function () {
-        const data = response.body.data
-        client.assert(data !== null)
-        client.assert(data.item_id === existingItemId)
-        client.assert(data.stock !== null && data.stock >= 0)
-    })
+    assertE2eDataEquals(existingItemId)
 %}
 
 ### 재고 차감 실패
