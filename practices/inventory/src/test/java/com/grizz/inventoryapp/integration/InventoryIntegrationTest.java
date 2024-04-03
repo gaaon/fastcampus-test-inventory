@@ -73,8 +73,24 @@ public class InventoryIntegrationTest {
 
     @DisplayName("재고 차감 성공")
     @Test
-    void test4() {
-        throw new NotImplementedTestException();
+    void test4() throws Exception {
+        // 1. 재고를 조회하고 100개인 것을 확인한다.
+        successGetStock(existingItemId, stock);
+
+        // 2. 재고 10개를 차감하고 성공한다.
+        final Long quantity = 10L;
+        final Long expectedStock = stock - quantity;
+        final String requestBody = "{\"quantity\": " +  quantity + "}";
+        mockMvc.perform(
+                        post("/api/v1/inventory/{itemId}/decrease", existingItemId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.item_id").value(existingItemId))
+                .andExpect(jsonPath("$.data.stock").value(90));
+
+        // 3. 재고를 조회하고 90개인 것을 확인한다.
+        successGetStock(existingItemId, 90L);
     }
 
     @DisplayName("재고 수정 실패")
