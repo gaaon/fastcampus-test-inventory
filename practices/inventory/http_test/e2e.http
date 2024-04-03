@@ -1,4 +1,19 @@
 ### 재고 조회 실패
+GET {{restUrl}}/api/v1/inventory/{{nonExistingItemId}}
+
+> {%
+    client.test("응답의 status는 404이다", function () {
+        client.assert(response.status === 404, "응답의 status는 404가 아니다")
+    })
+
+    client.test("응답의 body는 error를 포함한다", function () {
+        const error = response.body.error
+        client.assert(error !== null)
+        client.assert(error.code === 1000)
+        client.assert(error.local_message === '자산이 존재하지 않습니다')
+    })
+%}
+
 ### 재고 조회 성공
 ### 재고 차감 실패
 ### 재고 차감 성공
