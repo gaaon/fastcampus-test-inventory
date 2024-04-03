@@ -22,6 +22,10 @@ public class Inventory {
         return itemId;
     }
 
+    public void setStock(@NotNull Long stock) {
+        this.stock = stock;
+    }
+
     public @NotNull Long getStock() {
         return stock;
     }

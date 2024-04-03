@@ -26,7 +26,17 @@ public class InventoryPersistenceAdapterStub implements InventoryPersistenceAdap
 
     @Override
     public @Nullable Inventory decreaseStock(@NotNull String itemId, @NotNull Long quantity) {
-        return null;
+        final Optional<Inventory> optionalInventory = internalFindByItemId(itemId);
+
+        if (optionalInventory.isEmpty()) {
+            return null;
+        }
+
+        final Inventory inventory = optionalInventory.get();
+        final Long newStock = inventory.getStock() - quantity;
+        inventory.setStock(newStock);
+
+        return inventory;
     }
 
     @Override
