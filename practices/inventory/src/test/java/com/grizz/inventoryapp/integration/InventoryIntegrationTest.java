@@ -2,6 +2,7 @@ package com.grizz.inventoryapp.integration;
 
 import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
 import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,12 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Transactional
 @ActiveProfiles("integration-test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
@@ -95,8 +98,23 @@ public class InventoryIntegrationTest {
 
     @DisplayName("재고 수정 실패")
     @Test
-    void test5() {
-        throw new NotImplementedTestException();
+    void test5() throws Exception {
+        // 1. 재고를 조회하고 100개인 것을 확인한다.
+        successGetStock(existingItemId, stock);
+
+        // 2. 재고를 -100개로 수정하고 실패한다.
+        final Long newStock = -100L;
+        final String requestBody = "{\"stock\": " + newStock + "}";
+        mockMvc.perform(
+                        patch("/api/v1/inventory/{itemId}/stock", existingItemId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value(ErrorCodes.INVALID_STOCK.code))
+                .andExpect(jsonPath("$.error.local_message").value(ErrorCodes.INVALID_STOCK.message));
+
+        // 3. 재고를 조회하고 100개인 것을 확인한다.
+        successGetStock(existingItemId, stock);
     }
 
     @DisplayName("재고 수정 성공")
