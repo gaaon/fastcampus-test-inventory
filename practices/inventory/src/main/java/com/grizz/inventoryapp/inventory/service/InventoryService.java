@@ -7,6 +7,7 @@ import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockExcep
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidStockException;
 import com.grizz.inventoryapp.inventory.service.exception.ItemNotFoundException;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class InventoryService {
                 .orElse(null);
     }
 
+    @Transactional
     public @NotNull Inventory decreaseByItemId(@NotNull String itemId, @NotNull Long quantity) {
         if (quantity < 0) {
             throw new InvalidDecreaseQuantityException();
