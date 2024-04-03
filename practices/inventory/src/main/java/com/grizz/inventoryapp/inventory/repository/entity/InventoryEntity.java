@@ -1,6 +1,8 @@
 package com.grizz.inventoryapp.inventory.repository.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 @Table(name = "inventory")
 @Entity
 public class InventoryEntity {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private @Nullable Long id;
     private @NotNull String itemId;
