@@ -7,6 +7,7 @@ import com.grizz.inventoryapp.inventory.service.InventoryService;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
+import com.grizz.inventoryapp.inventory.service.exception.InvalidStockException;
 import com.grizz.inventoryapp.inventory.service.exception.ItemNotFoundException;
 import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import com.grizz.inventoryapp.test.fixture.InventoryFixture;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -189,22 +191,80 @@ public class InventoryControllerTest {
     @DisplayName("재고 수정")
     @Nested
     class UpdateStock {
+        final String itemId = "1";
+        final Long stock = 100L;
+
         @DisplayName("자산이 존재하지 않을 경우, 404 status와 error를 반환한다")
         @Test
         void test1() throws Exception {
-            throw new NotImplementedTestException();
+            // given
+            given(inventoryService.updateStock(itemId, stock))
+                    .willThrow(ItemNotFoundException.class);
+
+            // when
+            final var requestBody = "{\"stock\": " + stock + "}";
+            final var result = mockMvc.perform(
+                            patch("/api/v1/inventory/{itemId}/stock", itemId)
+                                    .content(requestBody)
+                                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andReturn();
+
+            // then
+            assertMvcErrorEquals(result, ErrorCodes.ITEM_NOT_FOUND);
+
+            verify(inventoryService).updateStock(itemId, stock);
         }
 
         @DisplayName("수정하려는 재고가 유효하지 않은 경우, 400 status와 error를 반환한다")
         @Test
         void test2() throws Exception {
-            throw new NotImplementedTestException();
+            // given
+            given(inventoryService.updateStock(itemId, stock))
+                    .willThrow(InvalidStockException.class);
+
+            // when
+            final var requestBody = "{\"stock\": " + stock + "}";
+            final var result = mockMvc.perform(
+                            patch("/api/v1/inventory/{itemId}/stock", itemId)
+                                    .content(requestBody)
+                                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest())
+                    .andReturn();
+
+            // then
+            assertMvcErrorEquals(result, ErrorCodes.INVALID_STOCK);
+
+            verify(inventoryService).updateStock(itemId, stock);
         }
 
         @DisplayName("정상인 경우, 200 status와 결과를 반환한다")
         @Test
         void test1000() throws Exception {
-            throw new NotImplementedTestException();
+            // given
+            final var inventory = InventoryFixture.sampleInventory(itemId, stock);
+            given(inventoryService.updateStock(itemId, stock))
+                    .willReturn(inventory);
+
+            // when
+            final var requestBody = "{\"stock\": " + stock + "}";
+            final var result = mockMvc.perform(
+                            patch("/api/v1/inventory/{itemId}/stock", itemId)
+                                    .content(requestBody)
+                                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            assertMvcDataEquals(result, dataField -> {
+                final var actualItemId = dataField.get("item_id").asText();
+                assertEquals(inventory.getItemId(), actualItemId);
+
+                final var actualStock = dataField.get("stock").asLong();
+                assertEquals(inventory.getStock(), actualStock);
+            });
+
+            verify(inventoryService).updateStock(itemId, stock);
         }
     }
 }
