@@ -16,6 +16,8 @@ GET {{restUrl}}/api/v1/inventory/{{existingItemId}}
     const existingItemId = request.environment.get('existingItemId')
 
     assertE2eDataEquals(existingItemId)
+
+    client.global.set('oldStock', response.body.data.stock + '')
 %}
 
 ### 재고 차감 실패
@@ -37,5 +39,35 @@ Content-Type: application/json
 %}
 
 ### 재고 차감 성공
+< {%
+    const quantity = 30
+    const oldStock = parseInt(client.global.get('oldStock'))
+    if (isNaN(oldStock)) {
+        throw new Error('Invalid oldStock')
+    }
+    if (oldStock < quantity) {
+        throw new Error('Insufficient stock')
+    }
+
+    request.variables.set('quantity', quantity + '')
+%}
+
+POST {{restUrl}}/api/v1/inventory/{{existingItemId}}/decrease
+Content-Type: application/json
+
+{
+    "quantity": {{quantity}}
+}
+
+> {%
+    import { assertE2eDataEquals } from './scripts/assertions'
+
+    const quantity = parseInt(request.variables.get('quantity'))
+    const existingItemId = request.environment.get('existingItemId')
+    const oldStock = parseInt(client.global.get('oldStock'))
+
+    assertE2eDataEquals(existingItemId, oldStock - quantity)
+%}
+
 ### 재고 수정 실패
 ### 재고 수정 성공
