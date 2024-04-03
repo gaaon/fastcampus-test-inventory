@@ -15,6 +15,23 @@ GET {{restUrl}}/api/v1/inventory/{{nonExistingItemId}}
 %}
 
 ### 재고 조회 성공
+GET {{restUrl}}/api/v1/inventory/{{existingItemId}}
+
+> {%
+    const existingItemId = request.environment.get('existingItemId')
+
+    client.test("응답의 status는 200이다", function () {
+        client.assert(response.status === 200, '응답의 status는 200이 아니다')
+    })
+
+    client.test('응답의 body는 data를 포함한다', function () {
+        const data = response.body.data
+        client.assert(data !== null)
+        client.assert(data.item_id === existingItemId)
+        client.assert(data.stock !== null && data.stock >= 0)
+    })
+%}
+
 ### 재고 차감 실패
 ### 재고 차감 성공
 ### 재고 수정 실패
