@@ -1,5 +1,6 @@
 package com.grizz.inventoryapp.inventory.repository;
 
+import com.grizz.inventoryapp.inventory.repository.entity.InventoryEntity;
 import com.grizz.inventoryapp.inventory.repository.jpa.InventoryJpaRepository;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.persistence.InventoryPersistenceAdapter;
@@ -15,7 +16,9 @@ public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdap
 
     @Override
     public @Nullable Inventory findByItemId(@NotNull String itemId) {
-        return null;
+        return inventoryJpaRepository.findByItemId(itemId)
+                .map(this::mapToDomain)
+                .orElse(null);
     }
 
     @Override
@@ -26,5 +29,9 @@ public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdap
     @Override
     public @NotNull Inventory save(@NotNull Inventory inventory) {
         return null;
+    }
+
+    private @NotNull Inventory mapToDomain(@NotNull InventoryEntity entity) {
+        return new Inventory(entity.getId(), entity.getItemId(), entity.getStock());
     }
 }
