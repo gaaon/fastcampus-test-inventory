@@ -2,7 +2,6 @@ package com.grizz.inventoryapp.inventory.repository;
 
 import com.grizz.inventoryapp.inventory.repository.jpa.InventoryJpaRepositoryStub;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
-import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -96,16 +95,47 @@ public class InventoryPersistenceAdapterImplTest {
 
     @Nested
     class Save {
+        final Long existingId = 1L;
+        final String existingItemId = "1";
+        final String nonExistingItemId = "2";
+        final Long oldStock = 10L;
+
+        @BeforeEach
+        void setUp() {
+            inventoryJpaRepositoryStub.addInventoryEntity(existingItemId, oldStock);
+        }
+
         @DisplayName("id를 갖는 entity가 없다면, entity를 추가하고 추가된 inventory를 반환한다")
         @Test
         void test1() {
-            throw new NotImplementedTestException();
+            // given
+            final Long newStock = 1234L;
+
+            // when
+            final Inventory inventory = new Inventory(null, nonExistingItemId, newStock);
+            final Inventory result = sut.save(inventory);
+
+            // then
+            assertNotNull(result.getId());
+            assertEquals(nonExistingItemId, result.getItemId());
+            assertEquals(newStock, result.getStock());
         }
 
         @DisplayName("id를 갖는 entity가 있다면, entity를 수정하고 수정된 inventory를 반환한다")
         @Test
         void test2() {
-            throw new NotImplementedTestException();
+            // given
+            final Long newStock = 1234L;
+            final Inventory inventory = sut.findByItemId(existingItemId);
+
+            // when
+            inventory.setStock(newStock);
+            final Inventory result = sut.save(inventory);
+
+            // then
+            assertEquals(1L, result.getId());
+            assertEquals(existingItemId, result.getItemId());
+            assertEquals(newStock, result.getStock());
         }
     }
 }
