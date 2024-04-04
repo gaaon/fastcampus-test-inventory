@@ -23,7 +23,17 @@ public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdap
 
     @Override
     public @Nullable Inventory decreaseStock(@NotNull String itemId, @NotNull Long quantity) {
-        return null;
+        final Integer result = inventoryJpaRepository.decreaseStock(itemId, quantity);
+        if (result == 0) {
+            return null;
+        }
+
+        final InventoryEntity entity = inventoryJpaRepository.findByItemId(itemId).orElse(null);
+        if (entity == null) {
+            return null;
+        }
+
+        return mapToDomain(entity);
     }
 
     @Override
