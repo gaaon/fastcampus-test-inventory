@@ -6,7 +6,9 @@ import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.persistence.InventoryPersistenceAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Component;
 
+@Component
 public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdapter {
     private final InventoryJpaRepository inventoryJpaRepository;
 
