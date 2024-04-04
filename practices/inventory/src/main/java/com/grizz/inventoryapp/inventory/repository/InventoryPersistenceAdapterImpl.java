@@ -28,20 +28,34 @@ public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdap
             return null;
         }
 
-        final InventoryEntity entity = inventoryJpaRepository.findByItemId(itemId).orElse(null);
-        if (entity == null) {
-            return null;
-        }
-
-        return mapToDomain(entity);
+        return inventoryJpaRepository.findByItemId(itemId)
+                .map(this::mapToDomain)
+                .orElse(null);
     }
 
     @Override
     public @NotNull Inventory save(@NotNull Inventory inventory) {
-        return null;
+        InventoryEntity entity = null;
+
+        if (inventory.getId() != null) {
+            entity = inventoryJpaRepository.findById(inventory.getId())
+                    .orElse(null);
+        }
+
+        if (entity == null) {
+            entity = mapToEntity(inventory);
+        }
+
+        entity.setStock(inventory.getStock());
+
+        return mapToDomain(inventoryJpaRepository.save(entity));
     }
 
     private @NotNull Inventory mapToDomain(@NotNull InventoryEntity entity) {
         return new Inventory(entity.getId(), entity.getItemId(), entity.getStock());
+    }
+
+    private @NotNull InventoryEntity mapToEntity(@NotNull Inventory inventory) {
+        return new InventoryEntity(inventory.getId(), inventory.getItemId(), inventory.getStock());
     }
 }

@@ -165,8 +165,10 @@ public class InventoryJpaRepositoryStub implements InventoryJpaRepository {
     }
 
     @Override
-    public Optional<InventoryEntity> findById(Long aLong) {
-        return Optional.empty();
+    public @NotNull Optional<InventoryEntity> findById(@NotNull Long aLong) {
+        return inventoryEntities.stream()
+                .filter(entity -> entity.getId() != null && entity.getId().equals(aLong))
+                .findFirst();
     }
 
     @Override
