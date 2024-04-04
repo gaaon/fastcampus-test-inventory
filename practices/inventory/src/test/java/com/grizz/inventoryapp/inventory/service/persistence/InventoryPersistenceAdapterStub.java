@@ -41,7 +41,23 @@ public class InventoryPersistenceAdapterStub implements InventoryPersistenceAdap
 
     @Override
     public @NotNull Inventory save(@NotNull Inventory inventory) {
-        return null;
+        final Long inventoryId = inventory.getId();
+        final Optional<Inventory> optionalInventory = inventoryList.stream()
+                .filter(entity -> entity.getId() != null && entity.getId().equals(inventoryId))
+                .findFirst();
+
+        Inventory entityToSave;
+
+        if (optionalInventory.isPresent()) {
+            entityToSave = optionalInventory.get();
+            entityToSave.setStock(inventory.getStock());
+        } else {
+            final Long id = idGenerator.getAndIncrement();
+            entityToSave = new Inventory(id, inventory.getItemId(), inventory.getStock());
+            inventoryList.add(entityToSave);
+        }
+
+        return entityToSave;
     }
 
     private Optional<Inventory> internalFindByItemId(String itemId) {
