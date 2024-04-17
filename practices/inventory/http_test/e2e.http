@@ -1,0 +1,98 @@
+### 재고 조회 실패
+GET {{restUrl}}/api/v1/inventory/{{nonExistingItemId}}
+
+> {%
+    import { assertE2eErrorEquals } from './scripts/assertions'
+
+    assertE2eErrorEquals(404, 1000, '자산이 존재하지 않습니다')
+%}
+
+### 재고 조회 성공
+GET {{restUrl}}/api/v1/inventory/{{existingItemId}}
+
+> {%
+    import { assertE2eDataEquals } from './scripts/assertions'
+
+    const existingItemId = request.environment.get('existingItemId')
+
+    assertE2eDataEquals(existingItemId)
+
+    client.global.set('oldStock', response.body.data.stock + '')
+%}
+
+### 재고 차감 실패
+< {%
+    const quantity = request.environment.get('veryLargeQuantity')
+    request.variables.set('quantity', quantity)
+%}
+POST {{restUrl}}/api/v1/inventory/{{existingItemId}}/decrease
+Content-Type: application/json
+
+{
+    "quantity": {{quantity}}
+}
+
+> {%
+    import { assertE2eErrorEquals } from './scripts/assertions'
+
+    assertE2eErrorEquals(400, 1001, '재고가 부족합니다')
+%}
+
+### 재고 차감 성공
+< {%
+    const quantity = 30
+    const oldStock = parseInt(client.global.get('oldStock'))
+    if (isNaN(oldStock)) {
+        throw new Error('Invalid oldStock')
+    }
+    if (oldStock < quantity) {
+        throw new Error('Insufficient stock')
+    }
+
+    request.variables.set('quantity', quantity + '')
+%}
+
+POST {{restUrl}}/api/v1/inventory/{{existingItemId}}/decrease
+Content-Type: application/json
+
+{
+    "quantity": {{quantity}}
+}
+
+> {%
+    import { assertE2eDataEquals } from './scripts/assertions'
+
+    const quantity = parseInt(request.variables.get('quantity'))
+    const existingItemId = request.environment.get('existingItemId')
+    const oldStock = parseInt(client.global.get('oldStock'))
+
+    assertE2eDataEquals(existingItemId, oldStock - quantity)
+%}
+
+### 재고 수정 실패
+@invalidStock = -1
+
+PATCH {{restUrl}}/api/v1/inventory/{{existingItemId}}/stock
+Content-Type: application/json
+
+{
+  "stock": {{invalidStock}}
+}
+
+> {%
+    import { assertE2eErrorEquals } from './scripts/assertions'
+
+    assertE2eErrorEquals(400, 1003, '재고가 유효하지 않습니다')
+%}
+
+### 재고 수정 성공
+< scripts/preUpdateStock.js
+
+PATCH {{restUrl}}/api/v1/inventory/{{existingItemId}}/stock
+Content-Type: application/json
+
+{
+  "stock": {{newStock}}
+}
+
+> scripts/testUpdateStock.js
