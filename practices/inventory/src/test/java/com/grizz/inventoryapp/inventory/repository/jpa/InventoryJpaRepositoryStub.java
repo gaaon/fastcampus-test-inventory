@@ -1,6 +1,7 @@
-package com.grizz.inventoryapp.inventory.repository;
+package com.grizz.inventoryapp.inventory.repository.jpa;
 
 import com.grizz.inventoryapp.inventory.repository.entity.InventoryEntity;
+import com.grizz.inventoryapp.inventory.repository.jpa.InventoryJpaRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -164,8 +165,10 @@ public class InventoryJpaRepositoryStub implements InventoryJpaRepository {
     }
 
     @Override
-    public Optional<InventoryEntity> findById(Long aLong) {
-        return Optional.empty();
+    public @NotNull Optional<InventoryEntity> findById(@NotNull Long aLong) {
+        return inventoryEntities.stream()
+                .filter(entity -> entity.getId() != null && entity.getId().equals(aLong))
+                .findFirst();
     }
 
     @Override

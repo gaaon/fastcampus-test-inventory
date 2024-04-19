@@ -18,6 +18,6 @@ public class InventoryFixture {
             inventoryStock = 100L;
         }
 
-        return new Inventory(inventoryItemId, inventoryStock);
+        return new Inventory(null, inventoryItemId, inventoryStock);
     }
 }
