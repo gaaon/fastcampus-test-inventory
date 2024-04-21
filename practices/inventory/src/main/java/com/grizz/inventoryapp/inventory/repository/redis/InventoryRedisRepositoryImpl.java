@@ -25,7 +25,7 @@ public class InventoryRedisRepositoryImpl implements InventoryRedisRepository {
 
     @Override
     public @NotNull Long decreaseStock(@NotNull String itemId, @NotNull Long quantity) {
-        return null;
+        return redisTemplate.opsForValue().decrement(key(itemId), quantity);
     }
 
     @Override
