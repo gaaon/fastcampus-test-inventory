@@ -35,6 +35,8 @@ public class InventoryRedisRepositoryImpl implements InventoryRedisRepository {
 
     @Override
     public @NotNull Long setStock(@NotNull String itemId, @NotNull Long stock) {
-        return null;
+        redisTemplate.opsForValue().set(key(itemId), stock.toString());
+
+        return stock;
     }
 }
