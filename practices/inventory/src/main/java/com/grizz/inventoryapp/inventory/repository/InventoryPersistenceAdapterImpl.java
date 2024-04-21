@@ -1,6 +1,6 @@
 package com.grizz.inventoryapp.inventory.repository;
 
-import com.grizz.inventoryapp.inventory.repository.entity.InventoryEntity;
+import com.grizz.inventoryapp.inventory.repository.jpa.entity.InventoryEntity;
 import com.grizz.inventoryapp.inventory.repository.jpa.InventoryJpaRepository;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.persistence.InventoryPersistenceAdapter;
