@@ -17,4 +17,23 @@ public class InventoryRedisRepositoryStub implements InventoryRedisRepository {
     public @Nullable Long getStock(@NotNull String itemId) {
         return stockMap.get(key(itemId));
     }
+
+    @Override
+    public @NotNull Long decreaseStock(@NotNull String itemId, @NotNull Long quantity) {
+        final Long stock = stockMap.getOrDefault(key(itemId), 0L);
+        final Long nextStock = stock - quantity;
+
+        stockMap.put(itemId, nextStock);
+
+        return nextStock;
+    }
+
+    @Override
+    public @NotNull Boolean deleteStock(@NotNull String itemId) {
+        final Boolean hasKey = stockMap.containsKey(key(itemId));
+
+        stockMap.remove(key(itemId));
+
+        return hasKey;
+    }
 }

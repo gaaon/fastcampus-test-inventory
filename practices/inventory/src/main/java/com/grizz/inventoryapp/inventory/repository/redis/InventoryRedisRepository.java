@@ -9,4 +9,8 @@ public interface InventoryRedisRepository {
     }
 
     @Nullable Long getStock(@NotNull String itemId);
+
+    @NotNull Long decreaseStock(@NotNull String itemId, @NotNull Long quantity);
+
+    @NotNull Boolean deleteStock(@NotNull String itemId);
 }

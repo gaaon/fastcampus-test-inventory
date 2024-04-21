@@ -1,13 +1,15 @@
 package com.grizz.inventoryapp.inventory.repository;
 
-import com.grizz.inventoryapp.inventory.repository.jpa.entity.InventoryEntity;
 import com.grizz.inventoryapp.inventory.repository.jpa.InventoryJpaRepository;
+import com.grizz.inventoryapp.inventory.repository.jpa.entity.InventoryEntity;
 import com.grizz.inventoryapp.inventory.repository.redis.InventoryRedisRepository;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.persistence.InventoryPersistenceAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdapter {
@@ -33,14 +35,16 @@ public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdap
 
     @Override
     public @Nullable Inventory decreaseStock(@NotNull String itemId, @NotNull Long quantity) {
-//        final Integer result = inventoryJpaRepository.decreaseStock(itemId, quantity);
-//        if (result == 0) {
-//            return null;
-//        }
+        final Long nextStock = inventoryRedisRepository.decreaseStock(itemId, quantity);
 
-        return inventoryJpaRepository.findByItemId(itemId)
-                .map(entity -> this.mapToDomain(entity, 0L))
-                .orElse(null);
+        final Optional<InventoryEntity> optionalEntity = inventoryJpaRepository.findByItemId(itemId);
+
+        if (optionalEntity.isEmpty()) {
+            inventoryRedisRepository.deleteStock(itemId);
+            return null;
+        }
+
+        return this.mapToDomain(optionalEntity.get(), nextStock);
     }
 
     @Override
