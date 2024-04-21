@@ -44,3 +44,5 @@ bin/
 .idea
 
 **/db_data
+
+jmeter.log
