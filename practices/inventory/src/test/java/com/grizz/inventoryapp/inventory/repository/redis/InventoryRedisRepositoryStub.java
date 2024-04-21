@@ -36,4 +36,11 @@ public class InventoryRedisRepositoryStub implements InventoryRedisRepository {
 
         return hasKey;
     }
+
+    @Override
+    public @NotNull Long setStock(@NotNull String itemId, @NotNull Long stock) {
+        stockMap.put(key(itemId), stock);
+
+        return stock;
+    }
 }
