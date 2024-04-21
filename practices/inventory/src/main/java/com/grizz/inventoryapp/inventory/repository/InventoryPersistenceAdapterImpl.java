@@ -25,10 +25,10 @@ public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdap
 
     @Override
     public @Nullable Inventory decreaseStock(@NotNull String itemId, @NotNull Long quantity) {
-        final Integer result = inventoryJpaRepository.decreaseStock(itemId, quantity);
-        if (result == 0) {
-            return null;
-        }
+//        final Integer result = inventoryJpaRepository.decreaseStock(itemId, quantity);
+//        if (result == 0) {
+//            return null;
+//        }
 
         return inventoryJpaRepository.findByItemId(itemId)
                 .map(this::mapToDomain)
@@ -48,16 +48,16 @@ public class InventoryPersistenceAdapterImpl implements InventoryPersistenceAdap
             entity = mapToEntity(inventory);
         }
 
-        entity.setStock(inventory.getStock());
+//        entity.setStock(inventory.getStock());
 
         return mapToDomain(inventoryJpaRepository.save(entity));
     }
 
     private @NotNull Inventory mapToDomain(@NotNull InventoryEntity entity) {
-        return new Inventory(entity.getId(), entity.getItemId(), entity.getStock());
+        return new Inventory(entity.getId(), entity.getItemId(), 0L);
     }
 
     private @NotNull InventoryEntity mapToEntity(@NotNull Inventory inventory) {
-        return new InventoryEntity(inventory.getId(), inventory.getItemId(), inventory.getStock());
+        return new InventoryEntity(inventory.getId(), inventory.getItemId(), 0L);
     }
 }
