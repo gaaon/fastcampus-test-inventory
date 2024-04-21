@@ -72,16 +72,26 @@ public class InventoryRedisRepositoryTest {
 
     @Nested
     class DecreaseStock {
+        final Long quantity = 10L;
+
         @DisplayName("itemId를 갖는 inventory가 없다면, inventory를 생성하고 stock을 차감하고 반환한다")
         @Test
         void test1() {
-            throw new NotImplementedTestException();
+            // when
+            final Long result = sut.decreaseStock(nonExistingItemId, quantity);
+
+            // then
+            assertEquals(-quantity, result);
         }
 
         @DisplayName("itemId를 갖는 inventory가 있다면, stock을 차감하고 반환한다")
         @Test
         void test2() {
-            throw new NotImplementedTestException();
+            // when
+            final Long result = sut.decreaseStock(existingItemId, quantity);
+
+            // then
+            assertEquals(stock - quantity, result);
         }
     }
 
