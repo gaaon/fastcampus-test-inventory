@@ -1,6 +1,5 @@
 package com.grizz.inventoryapp.inventory.repository.redis;
 
-import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -125,16 +124,26 @@ public class InventoryRedisRepositoryTest {
 
     @Nested
     class SetStock {
+        final Long newStock = 200L;
+
         @DisplayName("itemId를 갖는 inventory가 없다면, inventory를 생성하고 stock을 수정하고 반환한다")
         @Test
         void test1() {
-            throw new NotImplementedTestException();
+            // when
+            final Long result = sut.setStock(nonExistingItemId, newStock);
+
+            // then
+            assertEquals(newStock, result);
         }
 
         @DisplayName("itemId를 갖는 inventory가 있다면, stock을 수정하고 반환한다")
         @Test
         void test2() {
-            throw new NotImplementedTestException();
+            // when
+            final Long result = sut.setStock(existingItemId, newStock);
+
+            // then
+            assertEquals(newStock, result);
         }
     }
 
