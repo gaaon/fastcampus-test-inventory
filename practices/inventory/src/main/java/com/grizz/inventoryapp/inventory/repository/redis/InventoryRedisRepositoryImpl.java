@@ -30,7 +30,7 @@ public class InventoryRedisRepositoryImpl implements InventoryRedisRepository {
 
     @Override
     public @NotNull Boolean deleteStock(@NotNull String itemId) {
-        return null;
+        return redisTemplate.delete(key(itemId));
     }
 
     @Override
