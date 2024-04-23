@@ -1,7 +1,6 @@
 package com.grizz.inventoryapp.inventory.repository.jpa;
 
-import com.grizz.inventoryapp.inventory.repository.entity.InventoryEntity;
-import com.grizz.inventoryapp.inventory.repository.jpa.InventoryJpaRepository;
+import com.grizz.inventoryapp.inventory.repository.jpa.entity.InventoryEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;

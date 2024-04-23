@@ -1,8 +1,7 @@
 package com.grizz.inventoryapp.inventory.repository.jpa;
 
 import com.grizz.inventoryapp.config.JpaConfig;
-import com.grizz.inventoryapp.inventory.repository.entity.InventoryEntity;
-import com.grizz.inventoryapp.inventory.repository.jpa.InventoryJpaRepository;
+import com.grizz.inventoryapp.inventory.repository.jpa.entity.InventoryEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

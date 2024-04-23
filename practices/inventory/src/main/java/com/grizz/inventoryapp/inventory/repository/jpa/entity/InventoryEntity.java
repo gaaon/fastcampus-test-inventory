@@ -1,4 +1,4 @@
-package com.grizz.inventoryapp.inventory.repository.entity;
+package com.grizz.inventoryapp.inventory.repository.jpa.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

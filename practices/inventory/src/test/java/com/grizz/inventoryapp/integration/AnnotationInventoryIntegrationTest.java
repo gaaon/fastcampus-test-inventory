@@ -1,19 +1,24 @@
 package com.grizz.inventoryapp.integration;
 
 import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
+import com.grizz.inventoryapp.inventory.repository.redis.InventoryRedisRepository;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -32,9 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AnnotationInventoryIntegrationTest {
-    @Autowired
-    private MockMvc mockMvc;
-
     @Container
     private static final MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.3")
             .withDatabaseName("inventory")
@@ -44,16 +46,35 @@ public class AnnotationInventoryIntegrationTest {
             .withUrlParam("useSSL", "false")
             .withUrlParam("allowPublicKeyRetrieval", "true");
 
+    @Container
+    private static final GenericContainer<?> redisContainer = new GenericContainer<>("redis:7.2")
+            .withExposedPorts(6379);
+
     @DynamicPropertySource
     static void setDatasourceProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
         registry.add("spring.datasource.username", mySQLContainer::getUsername);
         registry.add("spring.datasource.password", mySQLContainer::getPassword);
+        registry.add("spring.data.redis.port", () -> redisContainer.getMappedPort(6379));
     }
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private InventoryRedisRepository inventoryRedisRepository;
 
     final String existingItemId = "1";
     final String nonExistingItemId = "2";
     final Long stock = 100L;
+
+    @BeforeEach
+    void setUp() {
+        redisTemplate.opsForValue().set(inventoryRedisRepository.key(existingItemId), stock.toString());
+    }
 
     @DisplayName("재고 조회 실패")
     @Test
@@ -196,6 +217,11 @@ public class AnnotationInventoryIntegrationTest {
 
         // 5. 재고를 조회하고 500개인 것을 확인한다.
         successGetStock(existingItemId, newStock);
+    }
+
+    @AfterEach
+    void tearDown() {
+        redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
 
     private void successGetStock(String itemId, Long stock) throws Exception {
