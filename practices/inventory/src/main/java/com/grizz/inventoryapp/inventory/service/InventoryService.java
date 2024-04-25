@@ -3,6 +3,7 @@ package com.grizz.inventoryapp.inventory.service;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.event.InventoryDecreasedEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryEventPublisher;
+import com.grizz.inventoryapp.inventory.service.event.InventoryUpdatedEvent;
 import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidStockException;
@@ -65,6 +66,10 @@ public class InventoryService {
 
         inventory.setStock(stock);
 
-        return inventoryAdapter.save(inventory);
+        final Inventory updatedInventory = inventoryAdapter.save(inventory);
+        final InventoryUpdatedEvent event = new InventoryUpdatedEvent(itemId, updatedInventory.getStock());
+        inventoryEventPublisher.publish(event);
+
+        return updatedInventory;
     }
 }
