@@ -1,6 +1,8 @@
 package com.grizz.inventoryapp.inventory.service;
 
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
+import com.grizz.inventoryapp.inventory.service.event.InventoryDecreasedEvent;
+import com.grizz.inventoryapp.inventory.service.event.InventoryEventPublisher;
 import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidStockException;
@@ -14,9 +16,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class InventoryService {
     private final InventoryPersistenceAdapter inventoryAdapter;
+    private final InventoryEventPublisher inventoryEventPublisher;
 
-    public InventoryService(InventoryPersistenceAdapter inventoryAdapter) {
+    public InventoryService(InventoryPersistenceAdapter inventoryAdapter, InventoryEventPublisher inventoryEventPublisher) {
         this.inventoryAdapter = inventoryAdapter;
+        this.inventoryEventPublisher = inventoryEventPublisher;
     }
 
     public @Nullable Inventory findByItemId(@NotNull String itemId) {
@@ -42,6 +46,9 @@ public class InventoryService {
         if (updatedInventory == null) {
             throw new ItemNotFoundException();
         }
+
+        final InventoryDecreasedEvent event = new InventoryDecreasedEvent(itemId, quantity, updatedInventory.getStock());
+        inventoryEventPublisher.publish(event);
 
         return updatedInventory;
     }
