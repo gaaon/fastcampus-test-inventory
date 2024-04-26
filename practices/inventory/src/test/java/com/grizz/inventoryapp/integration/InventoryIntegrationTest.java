@@ -25,6 +25,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static com.grizz.inventoryapp.test.assertion.Assertions.assertDecreasedEventEquals;
+import static com.grizz.inventoryapp.test.assertion.Assertions.assertUpdatedEventEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -175,6 +176,10 @@ public class InventoryIntegrationTest {
 
         // 3. 재고를 조회하고 1000개인 것을 확인한다.
         successGetStock(existingItemId, newStock);
+
+        // 4. 재고 수정 이벤트 1번 발행된 것을 확인한다.
+        final Message<byte[]> result = outputDestination.receive(1000, "inventory-out-0");
+        assertUpdatedEventEquals(result, existingItemId, newStock);
     }
 
     @DisplayName("재고 차감, 수정 종합")
