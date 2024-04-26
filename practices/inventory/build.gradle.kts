@@ -6,7 +6,10 @@ plugins {
 
 dependencies {
     implementation(Spring.boot.actuator)
-    implementation(Spring.boot.web)
+    implementation(Spring.boot.web.toString()) {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
+    }
+    implementation("org.springframework.boot:spring-boot-starter-undertow")
     implementation(Spring.boot.data.jpa)
     implementation(Spring.boot.data.redis)
 
