@@ -1,6 +1,10 @@
 package com.grizz.inventoryapp.inventory.service;
 
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
+import com.grizz.inventoryapp.inventory.service.event.InventoryDecreasedEvent;
+import com.grizz.inventoryapp.inventory.service.event.InventoryEvent;
+import com.grizz.inventoryapp.inventory.service.event.InventoryEventPublisher;
+import com.grizz.inventoryapp.inventory.service.event.InventoryUpdatedEvent;
 import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidStockException;
@@ -12,6 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,6 +34,9 @@ class InventoryServiceTest {
 
     @Spy
     InventoryPersistenceAdapterStub inventoryAdapter;
+
+    @Mock
+    InventoryEventPublisher inventoryEventPublisher;
 
     @Nested
     class FindByItemId {
@@ -145,6 +153,9 @@ class InventoryServiceTest {
             assertNotNull(result);
             assertEquals(existingItemId, result.getItemId());
             assertEquals(stock - quantity, result.getStock());
+
+            final InventoryEvent expectedEvent = new InventoryDecreasedEvent(existingItemId, quantity, stock - quantity);
+            verify(inventoryEventPublisher).publish(expectedEvent);
         }
     }
 
@@ -196,6 +207,9 @@ class InventoryServiceTest {
             assertNotNull(result);
             assertEquals(existingItemId, result.getItemId());
             assertEquals(newStock, result.getStock());
+
+            final InventoryEvent expectedEvent = new InventoryUpdatedEvent(existingItemId, newStock);
+            verify(inventoryEventPublisher).publish(expectedEvent);
         }
     }
 }
