@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.Message;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -22,6 +24,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static com.grizz.inventoryapp.test.assertion.Assertions.assertDecreasedEventEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,6 +56,9 @@ public class InventoryIntegrationTest {
 
     @Autowired
     private InventoryRedisRepository inventoryRedisRepository;
+
+    @Autowired
+    private OutputDestination outputDestination;
 
     final String existingItemId = "1";
     final String nonExistingItemId = "2";
@@ -122,7 +128,11 @@ public class InventoryIntegrationTest {
                 .andExpect(jsonPath("$.data.stock").value(90));
 
         // 3. 재고를 조회하고 90개인 것을 확인한다.
-        successGetStock(existingItemId, 90L);
+        successGetStock(existingItemId, expectedStock);
+
+        // 4. 재고 차감 이벤트 1번 발행된 것을 확인한다.
+        final Message<byte[]> result = outputDestination.receive(1000, "inventory-out-0");
+        assertDecreasedEventEquals(result, existingItemId, quantity, expectedStock);
     }
 
     @DisplayName("재고 수정 실패")

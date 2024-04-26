@@ -135,7 +135,7 @@ public class AnnotationInventoryIntegrationTest {
                 .andExpect(jsonPath("$.data.stock").value(90));
 
         // 3. 재고를 조회하고 90개인 것을 확인한다.
-        successGetStock(existingItemId, 90L);
+        successGetStock(existingItemId, expectedStock);
     }
 
     @DisplayName("재고 수정 실패")
