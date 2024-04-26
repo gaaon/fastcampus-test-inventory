@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.grizz.inventoryapp.inventory.service.event.InventoryDecreasedEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryEventPublisher;
-import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
+import com.grizz.inventoryapp.inventory.service.event.InventoryUpdatedEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -61,10 +61,27 @@ public class InventoryEventPublisherTest {
 
     @Nested
     class InventoryUpdatedEventTest {
+        final String itemId = "1";
+        final Long stock = 100L;
+
         @DisplayName("InventoryUpdatedEvent 객체를 publish하면, 메시지가 발행된다")
         @Test
-        void test1() {
-            throw new NotImplementedTestException();
+        void test1() throws JsonProcessingException {
+            // when
+            final InventoryEvent event = new InventoryUpdatedEvent(itemId, stock);
+            sut.publish(event);
+
+            // then
+            final Message<byte[]> result = outputDestination.receive(1000, "inventory-out-0");
+
+            final String payload = new String(result.getPayload());
+            final JsonNode json = objectMapper.readTree(payload);
+            assertEquals("InventoryUpdated", json.get("type").asText());
+            assertEquals(itemId, json.get("item_id").asText());
+            assertEquals(stock, json.get("stock").asLong());
+
+            final String messageKey = result.getHeaders().get(InventoryEventPublisher.MESSAGE_KEY, String.class);
+            assertEquals(itemId, messageKey);
         }
     }
 }
