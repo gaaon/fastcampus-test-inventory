@@ -12,14 +12,19 @@ import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.messaging.Message;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
 public class InventoryEventPublisherTest {
+    @Autowired
     InventoryEventPublisher sut;
 
+    @Autowired
     OutputDestination outputDestination;
 
     private final ObjectMapper objectMapper = new ObjectMapper()

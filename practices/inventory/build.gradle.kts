@@ -13,6 +13,8 @@ dependencies {
     implementation(Spring.boot.data.jpa)
     implementation(Spring.boot.data.redis)
 
+    implementation(Spring.cloud.stream.stream)
+
     implementation("mysql:mysql-connector-java:_")
 
     // test
