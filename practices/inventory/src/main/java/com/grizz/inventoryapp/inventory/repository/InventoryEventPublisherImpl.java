@@ -2,9 +2,11 @@ package com.grizz.inventoryapp.inventory.repository;
 
 import com.grizz.inventoryapp.inventory.repository.kafka.InventoryDecreasedKafkaEvent;
 import com.grizz.inventoryapp.inventory.repository.kafka.InventoryKafkaEvent;
+import com.grizz.inventoryapp.inventory.repository.kafka.InventoryUpdatedKafkaEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryDecreasedEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryEventPublisher;
+import com.grizz.inventoryapp.inventory.service.event.InventoryUpdatedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
@@ -34,7 +36,8 @@ public class InventoryEventPublisherImpl implements InventoryEventPublisher {
         return switch (event) {
             case InventoryDecreasedEvent decreasedEvent ->
                     InventoryDecreasedKafkaEvent.fromDomainEvent(decreasedEvent);
-            default -> throw new IllegalArgumentException("Unknown event type: " + event);
+            case InventoryUpdatedEvent updatedEvent ->
+                    InventoryUpdatedKafkaEvent.fromDomainEvent(updatedEvent);
         };
     }
 }
