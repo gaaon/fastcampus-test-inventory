@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        inventory-out-0:
+          destination: inventory
+          content-type: application/json
