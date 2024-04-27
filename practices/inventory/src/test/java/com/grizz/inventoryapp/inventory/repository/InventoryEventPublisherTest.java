@@ -5,12 +5,12 @@ import com.grizz.inventoryapp.inventory.service.event.InventoryDecreasedEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryEvent;
 import com.grizz.inventoryapp.inventory.service.event.InventoryEventPublisher;
 import com.grizz.inventoryapp.inventory.service.event.InventoryUpdatedEvent;
+import com.grizz.inventoryapp.test.binder.KafkaOutputDestination;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.messaging.Message;
 
 import static com.grizz.inventoryapp.test.assertion.Assertions.assertDecreasedEventEquals;
@@ -22,7 +22,7 @@ public class InventoryEventPublisherTest {
     InventoryEventPublisher sut;
 
     @Autowired
-    OutputDestination outputDestination;
+    KafkaOutputDestination outputDestination;
 
     @Nested
     class InventoryDecreasedEventTest {

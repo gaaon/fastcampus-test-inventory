@@ -2,6 +2,7 @@ package com.grizz.inventoryapp.integration;
 
 import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
 import com.grizz.inventoryapp.inventory.repository.redis.InventoryRedisRepository;
+import com.grizz.inventoryapp.test.binder.KafkaOutputDestination;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
@@ -59,7 +59,7 @@ public class InventoryIntegrationTest {
     private InventoryRedisRepository inventoryRedisRepository;
 
     @Autowired
-    private OutputDestination outputDestination;
+    private KafkaOutputDestination outputDestination;
 
     final String existingItemId = "1";
     final String nonExistingItemId = "2";
