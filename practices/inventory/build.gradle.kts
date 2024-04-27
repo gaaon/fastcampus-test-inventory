@@ -30,6 +30,9 @@ dependencies {
 
     // archunit
     testImplementation("com.tngtech.archunit:archunit-junit5:_")
+
+    // kafka
+    testImplementation("org.springframework.kafka:spring-kafka-test")
 }
 
 dependencyManagement {

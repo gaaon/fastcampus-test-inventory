@@ -5,3 +5,9 @@ spring:
         inventory-out-0:
           destination: inventory
           content-type: application/json
+      kafka:
+        bindings:
+          inventory-out-0:
+            producer:
+              configuration:
+                key.serializer: org.apache.kafka.common.serialization.StringSerializer
