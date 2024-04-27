@@ -13,6 +13,8 @@ dependencies {
     implementation(Spring.boot.data.jpa)
     implementation(Spring.boot.data.redis)
 
+    implementation(Spring.cloud.stream.stream)
+
     implementation("mysql:mysql-connector-java:_")
 
     // test
@@ -26,4 +28,13 @@ dependencies {
 
     // archunit
     testImplementation("com.tngtech.archunit:archunit-junit5:_")
+
+    // spring-cloud-stream
+    testImplementation("org.springframework.cloud:spring-cloud-stream-test-binder")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
+    }
 }

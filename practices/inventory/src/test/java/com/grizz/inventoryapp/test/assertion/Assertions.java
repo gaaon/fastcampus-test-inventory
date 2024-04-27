@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
+import com.grizz.inventoryapp.inventory.service.event.InventoryEventPublisher;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.messaging.Message;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.UnsupportedEncodingException;
@@ -44,5 +47,32 @@ public class Assertions {
         assertTrue(dataField.isObject());
 
         consumer.accept(dataField);
+    }
+
+    public static void assertDecreasedEventEquals(
+            @NotNull Message<byte[]> result, @NotNull String itemId, @NotNull Long quantity, @NotNull Long stock
+    ) throws JsonProcessingException {
+        final String payload = new String(result.getPayload());
+        final JsonNode json = objectMapper.readTree(payload);
+        assertEquals("InventoryDecreased", json.get("type").asText());
+        assertEquals(itemId, json.get("item_id").asText());
+        assertEquals(quantity, json.get("quantity").asLong());
+        assertEquals(stock, json.get("stock").asLong());
+
+        final String messageKey = result.getHeaders().get(InventoryEventPublisher.MESSAGE_KEY, String.class);
+        assertEquals(itemId, messageKey);
+    }
+
+    public static void assertUpdatedEventEquals(
+            @NotNull Message<byte[]> result, @NotNull String itemId, @NotNull Long stock
+    ) throws JsonProcessingException {
+        final String payload = new String(result.getPayload());
+        final JsonNode json = objectMapper.readTree(payload);
+        assertEquals("InventoryUpdated", json.get("type").asText());
+        assertEquals(itemId, json.get("item_id").asText());
+        assertEquals(stock, json.get("stock").asLong());
+
+        final String messageKey = result.getHeaders().get(InventoryEventPublisher.MESSAGE_KEY, String.class);
+        assertEquals(itemId, messageKey);
     }
 }
