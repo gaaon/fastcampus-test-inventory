@@ -49,11 +49,7 @@ public class InventoryService {
         }
 
         final InventoryDecreasedEvent event = new InventoryDecreasedEvent(itemId, quantity, updatedInventory.getStock());
-        try {
-            inventoryEventPublisher.publish(event);
-        } catch (Exception e) {
-            // do nothing temporarily
-        }
+        inventoryEventPublisher.publish(event);
 
         return updatedInventory;
     }
@@ -72,11 +68,7 @@ public class InventoryService {
 
         final Inventory updatedInventory = inventoryAdapter.save(inventory);
         final InventoryUpdatedEvent event = new InventoryUpdatedEvent(itemId, updatedInventory.getStock());
-        try {
-            inventoryEventPublisher.publish(event);
-        } catch (Exception e) {
-            // do nothing temporarily
-        }
+        inventoryEventPublisher.publish(event);
 
         return updatedInventory;
     }

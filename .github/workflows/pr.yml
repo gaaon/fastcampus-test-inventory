@@ -21,6 +21,7 @@ jobs:
           java-version: 21
           distribution: temurin
           cache: gradle
-      - name: Run test
+      - name: Run test and jacoco
         run: |
-          ./gradlew -p "practices/inventory" test
+          ./gradlew -p "practices/inventory" test jacocoTestReport
+      - run: ls -al practices/inventory/build/reports/jacoco/test
