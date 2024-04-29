@@ -3,6 +3,7 @@ plugins {
     id("custom.test-conventions")
     id("custom.spring-conventions")
     id("custom.jacoco-conventions")
+    id("custom.sonar-conventions")
 }
 
 dependencies {
@@ -39,5 +40,12 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "fastcampus-test-inventory")
+        property("sonar.projectName", "fastcampus-test-inventory")
     }
 }
