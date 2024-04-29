@@ -14,10 +14,6 @@ public class Inventory {
         this.stock = stock;
     }
 
-    public void setId(@Nullable Long id) {
-        this.id = id;
-    }
-
     public @Nullable Long getId() {
         return id;
     }
