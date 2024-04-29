@@ -8,7 +8,11 @@ repositories {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        if (EnvUtils.isAct()) {
+            excludeTags("integration")
+        }
+    }
 
     testLogging {
         events("passed", "skipped", "failed")
