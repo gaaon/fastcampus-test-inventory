@@ -11,6 +11,6 @@ jacoco {
 tasks.jacocoTestReport {
     reports {
         html.required.set(EnvUtils.isLocal())
-        xml.required.set(EnvUtils.isCI())
+        xml.required.set(true)
     }
 }
