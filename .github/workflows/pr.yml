@@ -24,4 +24,9 @@ jobs:
       - name: Run test and jacoco
         run: |
           ./gradlew -p "practices/inventory" test jacocoTestReport
-      - run: ls -al practices/inventory/build/reports/jacoco/test
+      - name: Run sonar
+        if: ${{ !env.ACT }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./gradlew -p "practices/inventory" sonar

@@ -23,6 +23,13 @@ jobs:
       - name: Run test and jacoco
         run: |
           ./gradlew -p "practices/inventory" test jacocoTestReport
+      - name: Run sonar
+        if: ${{ !env.ACT }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./gradlew -p "practices/inventory" sonar
+
   deploy:
     name: Deploy
     runs-on: ubuntu-22.04
